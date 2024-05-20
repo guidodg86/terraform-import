@@ -32,3 +32,7 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# AWS enviroment variables
+.aws_env.sh
+account_ID.txt
