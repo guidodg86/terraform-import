@@ -1,9 +1,9 @@
-import {
-  to = aws_security_group.fraa_1_sg
-  id = "sg-088e213a4ee31355f"
-}
+# import {
+#   to = aws_security_group.fraa_1_sg
+#   id = "sg-0b70ca791008d53bb"
+# }
 
-import {
-  to = aws_security_group.fraa_2_sg
-  id = "sg-0ef4eb74e412a6f03"
-}
+# import {
+#   to = aws_security_group.fraa_2_sg
+#   id = "sg-0abc953959336796b"
+# }
