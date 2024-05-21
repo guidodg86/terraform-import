@@ -7,6 +7,12 @@ Parameters:
     Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
   Fraa1SubnetId:
     Type: String
+  Fraa1VpcId:
+    Type: String
+  Fraa2SubnetId:
+    Type: String
+  Fraa2VpcId:
+    Type: String
 
 
 Resources:
@@ -16,3 +22,106 @@ Resources:
       ImageId: !Ref LatestAmiId
       InstanceType: "t2.micro"
       SubnetId: !Ref Fraa1SubnetId
+      SecurityGroupIds:
+           - !Ref fraa1InstaceSG
+      Tags:
+        - Key: "Name"
+          Value: "fraa1_Instance"
+
+  fraa1InstaceSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: fraa1_sg
+      VpcId: !Ref Fraa1VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 10.25.1.0/24
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 10.35.2.0/24
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 1443
+          ToPort: 1443
+          CidrIp: 0.0.0.0/0
+  
+  OutboundRule:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      IpProtocol: tcp
+      FromPort: 10000
+      ToPort: 15000
+      DestinationSecurityGroupId:
+        Fn::GetAtt:
+          - fraa1InstaceSG
+          - GroupId
+      GroupId:
+        Fn::GetAtt:
+          - fraa1InstaceSG
+          - GroupId
+
+
+  fraa2Instace: 
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: !Ref LatestAmiId
+      InstanceType: "t2.micro"
+      SubnetId: !Ref Fraa2SubnetId
+      SecurityGroupIds:
+           - !Ref fraa2InstaceSG
+      Tags:
+        - Key: "Name"
+          Value: "fraa2_Instance"
+
+  fraa2InstaceSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: fraa2_sg
+      VpcId: !Ref Fraa2VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 10.25.2.0/24
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 10.35.3.0/24
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 1443
+          ToPort: 1450
+          CidrIp: 0.0.0.0/0
+  
+  OutboundRulefraa21:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      IpProtocol: tcp
+      FromPort: 15000
+      ToPort: 15600
+      DestinationSecurityGroupId:
+        Fn::GetAtt:
+          - fraa1InstaceSG
+          - GroupId
+      GroupId:
+        Fn::GetAtt:
+          - fraa2InstaceSG
+          - GroupId
+  
+  OutboundRulefraa22:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      IpProtocol: tcp
+      FromPort: 10000
+      ToPort: 15000
+      DestinationSecurityGroupId:
+        Fn::GetAtt:
+          - fraa2InstaceSG
+          - GroupId
+      GroupId:
+        Fn::GetAtt:
+          - fraa2InstaceSG
+          - GroupId

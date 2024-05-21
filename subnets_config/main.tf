@@ -118,7 +118,7 @@ resource "aws_route_table" "route_table_fraa_1_1a" {
     nat_gateway_id = aws_nat_gateway.fraa_1_1a_nat_gateway.id
   }
   route {
-    cidr_block     = "10.35.0.0/16"
+    cidr_block                = "10.35.0.0/16"
     vpc_peering_connection_id = aws_vpc_peering_connection.fraa_1__fraa_2.id
   }
 
@@ -182,10 +182,19 @@ resource "aws_route" "peer_fraa_1" {
 }
 
 
+output "fraa_1__vpc_id" {
+  value = aws_vpc.fraa_1.id
+}
+
 output "fraa_1__subnet_id" {
   value = aws_subnet.fraa_1_1a.id
+}
+
+output "fraa_2__vpc_id" {
+  value = aws_vpc.fraa_2.id
 }
 
 output "fraa_2__subnet_id" {
   value = aws_subnet.fraa_2_1b.id
 }
+

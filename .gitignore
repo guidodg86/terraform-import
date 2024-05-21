@@ -36,3 +36,4 @@ terraform.rc
 # AWS enviroment variables
 .aws_env.sh
 account_ID.txt
+security_groups.tf
