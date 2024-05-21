@@ -93,7 +93,7 @@ resource "aws_eip" "nat_gw_eip" {
 
   tags = {
     Name = "nat_gw_eip"
-  } 
+  }
 
 }
 
@@ -114,8 +114,12 @@ resource "aws_route_table" "route_table_fraa_1_1a" {
   vpc_id = aws_vpc.fraa_1.id
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.fraa_1_1a_nat_gateway.id
+  }
+  route {
+    cidr_block     = "10.35.0.0/16"
+    vpc_peering_connection_id = aws_vpc_peering_connection.fraa_1__fraa_2.id
   }
 
   tags = {
@@ -132,25 +136,56 @@ resource "aws_route_table_association" "a_fraa_1_1a" {
 
 resource "aws_route_table_association" "a_fraa_1_1b" {
   subnet_id      = aws_subnet.fraa_1_1b.id
-  route_table_id = aws_vpc.fraa_1.default_route_table_id 
+  route_table_id = aws_vpc.fraa_1.default_route_table_id
 }
 
 resource "aws_route_table_association" "a_fraa_1_1c" {
   subnet_id      = aws_subnet.fraa_1_1c.id
-  route_table_id = aws_vpc.fraa_1.default_route_table_id 
+  route_table_id = aws_vpc.fraa_1.default_route_table_id
 }
 
 resource "aws_route_table_association" "a_fraa_2_1a" {
   subnet_id      = aws_subnet.fraa_2_1a.id
-  route_table_id = aws_vpc.fraa_2.default_route_table_id 
+  route_table_id = aws_vpc.fraa_2.default_route_table_id
 }
 
 resource "aws_route_table_association" "a_fraa_2_1b" {
   subnet_id      = aws_subnet.fraa_2_1b.id
-  route_table_id = aws_vpc.fraa_2.default_route_table_id 
+  route_table_id = aws_vpc.fraa_2.default_route_table_id
 }
 
 resource "aws_route_table_association" "a_fraa_2_1c" {
   subnet_id      = aws_subnet.fraa_2_1c.id
-  route_table_id = aws_vpc.fraa_2.default_route_table_id 
+  route_table_id = aws_vpc.fraa_2.default_route_table_id
+}
+
+
+resource "aws_vpc_peering_connection" "fraa_1__fraa_2" {
+  peer_vpc_id = aws_vpc.fraa_1.id
+  vpc_id      = aws_vpc.fraa_2.id
+  auto_accept = true
+  tags = {
+    Name = "fraa_1__fraa_2"
+  }
+}
+
+resource "aws_route" "peer_fraa_2" {
+  route_table_id            = aws_vpc.fraa_1.default_route_table_id
+  destination_cidr_block    = "10.35.0.0/16"
+  vpc_peering_connection_id = aws_vpc_peering_connection.fraa_1__fraa_2.id
+}
+
+resource "aws_route" "peer_fraa_1" {
+  route_table_id            = aws_vpc.fraa_2.default_route_table_id
+  destination_cidr_block    = "10.25.0.0/16"
+  vpc_peering_connection_id = aws_vpc_peering_connection.fraa_1__fraa_2.id
+}
+
+
+output "fraa_1__subnet_id" {
+  value = aws_subnet.fraa_1_1a.id
+}
+
+output "fraa_2__subnet_id" {
+  value = aws_subnet.fraa_2_1b.id
 }
